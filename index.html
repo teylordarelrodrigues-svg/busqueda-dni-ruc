@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Búsqueda DNI · RUC · Perú</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0D0D0D;--surface:#1A1A1A;--surface2:#222222;
+  --orange:#FF6B2B;--orange2:#E85A1A;--orange-glow:rgba(255,107,43,0.18);
+  --white:#FFFFFF;--gray:#888888;--gray2:#444444;
+  --green:#34C759;--red:#FF3B30;--border:rgba(255,107,43,0.22);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--white);min-height:100vh;padding-bottom:40px}
+/* HEADER */
+.header{background:var(--surface);padding:16px 18px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:38px;height:38px;border-radius:12px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:18px}
+.logo-text{font-size:18px;font-weight:700}
+.logo-sub{font-size:10px;color:var(--orange);font-weight:700;letter-spacing:1px;margin-top:1px}
+.hdr-actions{display:flex;gap:8px}
+.hdr-btn{width:38px;height:38px;border-radius:11px;border:1px solid var(--border);background:var(--surface2);color:var(--orange);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.18s}
+.hdr-btn:hover{background:var(--orange-glow);border-color:var(--orange)}
+/* MAIN */
+.main{max-width:460px;margin:0 auto;padding:20px 16px 0}
+/* BACKEND STATUS BANNER */
+.backend-banner{
+  border-radius:13px;padding:12px 14px;margin-bottom:16px;
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  border:1px solid;transition:all 0.2s;
+}
+.backend-banner.notset{background:rgba(255,107,43,0.1);border-color:rgba(255,107,43,0.35)}
+.backend-banner.ok{background:rgba(52,199,89,0.08);border-color:rgba(52,199,89,0.3)}
+.backend-banner.err{background:rgba(255,59,48,0.08);border-color:rgba(255,59,48,0.3)}
+.bb-icon{font-size:22px;flex-shrink:0}
+.bb-text strong{display:block;font-size:13px;font-weight:700;margin-bottom:2px}
+.bb-text span{font-size:11px;color:var(--gray);line-height:1.45}
+.bb-arrow{margin-left:auto;color:var(--gray);font-size:16px}
+/* SEARCH CARD */
+.search-card{background:var(--surface);border-radius:18px;padding:20px;border:1px solid var(--border)}
+.field-label{font-size:10px;color:var(--gray);letter-spacing:1.2px;font-weight:700;text-transform:uppercase;margin-bottom:10px}
+.input-wrap{position:relative}
+.doc-input{width:100%;padding:15px 62px 15px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:13px;color:var(--white);font-size:22px;font-weight:700;letter-spacing:3px;outline:none;transition:border-color 0.2s;-moz-appearance:textfield}
+.doc-input::-webkit-outer-spin-button,.doc-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.doc-input:focus{border-color:var(--orange)}
+.doc-input::placeholder{color:var(--gray2);font-size:15px;letter-spacing:1px}
+.type-badge{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--orange);color:#fff;font-size:11px;font-weight:800;padding:4px 10px;border-radius:7px;display:none}
+.hint{font-size:12px;color:var(--orange);text-align:center;margin-top:10px;font-weight:500}
+.search-btn{width:100%;padding:16px;margin-top:15px;background:var(--orange);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:800;letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.search-btn:hover:not(:disabled){background:var(--orange2);transform:translateY(-1px)}
+.search-btn:disabled{opacity:0.35;cursor:not-allowed}
+/* STATUS */
+.status-bar{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--gray);margin-top:10px;min-height:18px}
+.status-dot{width:6px;height:6px;border-radius:50%;background:var(--gray2)}
+.status-dot.ok{background:var(--green)}.status-dot.err{background:var(--red)}
+/* SPINNER */
+.spinner-wrap{background:var(--surface);border-radius:18px;padding:32px;margin-top:18px;text-align:center;border:1px solid var(--border)}
+.spinner{width:44px;height:44px;margin:0 auto 14px;border:3px solid var(--orange-glow);border-top-color:var(--orange);border-radius:50%;animation:spin 0.75s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-label{color:var(--orange);font-weight:600;font-size:15px}
+.spinner-sub{color:var(--gray);font-size:12px;margin-top:4px}
+/* RESULT */
+.result-card{background:var(--surface);border-radius:18px;padding:20px;margin-top:18px;border:1px solid var(--border);animation:slideUp 0.28s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.result-head{display:flex;align-items:center;justify-content:space-between;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.06);margin-bottom:4px}
+.rbadge{background:var(--orange);color:#fff;font-size:12px;font-weight:800;padding:5px 13px;border-radius:9px}
+.rnum{font-size:13px;color:var(--gray);font-family:monospace;letter-spacing:1px}
+.rrow{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.04);gap:10px}
+.rrow:last-child{border-bottom:none;padding-bottom:0}
+.rinfo{flex:1;min-width:0}
+.rfield-label{font-size:10px;color:var(--gray);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:3px;font-weight:600}
+.rfield-val{font-size:15px;font-weight:600;color:var(--white);word-break:break-word;line-height:1.3}
+.copy-btn{flex-shrink:0;background:var(--orange-glow);border:1px solid var(--border);color:var(--orange);padding:7px 11px;border-radius:9px;cursor:pointer;font-size:12px;font-weight:600;transition:all 0.18s;white-space:nowrap}
+.copy-btn:hover{background:rgba(255,107,43,0.28);border-color:var(--orange)}
+.copy-btn.ok{background:rgba(52,199,89,0.12);border-color:rgba(52,199,89,0.4);color:var(--green)}
+.fuente-tag{font-size:10px;color:var(--gray);margin-top:10px;text-align:right;opacity:0.7}
+/* ERROR */
+.error-card{background:rgba(255,59,48,0.08);border:1px solid rgba(255,59,48,0.25);border-radius:16px;padding:20px;margin-top:18px;text-align:center;animation:slideUp 0.28s ease}
+.error-icon{font-size:28px;margin-bottom:8px}
+.error-title{font-weight:700;color:var(--red);margin-bottom:5px}
+.error-msg{font-size:13px;color:rgba(255,59,48,0.75);line-height:1.5}
+/* INTENTOS PANEL */
+.intentos-panel{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:13px 15px;margin-top:16px}
+.intentos-title{font-size:10px;color:var(--gray);font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:10px}
+.int-row{display:flex;align-items:center;gap:8px;font-size:12px;padding:3px 0}
+.i-name{flex:1;color:var(--gray)}.i-name.win{color:var(--white);font-weight:700}
+.i-tag{font-size:10px;padding:2px 7px;border-radius:5px}
+.i-tag.ok{background:rgba(52,199,89,0.15);color:var(--green)}
+.i-tag.fail{background:rgba(255,59,48,0.12);color:var(--red)}
+.i-tag.skip{background:var(--surface2);color:var(--gray2)}
+/* MODALS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(3px)}
+.overlay.show{display:flex}
+.modal{background:var(--surface);border-radius:22px 22px 0 0;border-top:1px solid var(--border);padding:10px 18px 36px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto}
+.modal-handle{width:36px;height:4px;background:rgba(255,255,255,0.15);border-radius:2px;margin:10px auto 18px}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:5px}
+.modal-sub{font-size:13px;color:var(--gray);margin-bottom:18px;line-height:1.5}
+.modal-actions{display:flex;gap:10px;margin-top:18px}
+.btn-cancel{flex:1;padding:14px;background:var(--surface2);color:var(--white);border:1px solid var(--gray2);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-ok{flex:1;padding:14px;background:var(--orange);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer}
+.btn-ok:hover{background:var(--orange2)}
+/* HISTORY */
+.h-empty{text-align:center;padding:36px 0;color:var(--gray)}
+.hist-item{background:var(--surface2);border-radius:13px;padding:13px 14px;margin-bottom:9px;cursor:pointer;border:1px solid rgba(255,255,255,0.04);transition:border-color 0.18s}
+.hist-item:hover{border-color:var(--border)}
+.hist-item-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.hist-badge{background:var(--orange);color:#fff;font-size:10px;font-weight:800;padding:3px 8px;border-radius:6px}
+.hist-date{font-size:11px;color:var(--gray)}
+.hist-num{font-size:12px;color:var(--gray);font-family:monospace;margin-bottom:3px}
+.hist-name{font-size:15px;font-weight:700;color:var(--white)}
+/* SETUP MODAL */
+.setup-step{background:var(--bg);border-radius:13px;padding:14px;margin-bottom:10px;border:1px solid rgba(255,255,255,0.06)}
+.step-num{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--orange);color:#fff;font-size:12px;font-weight:800;align-items:center;justify-content:center;margin-right:8px;flex-shrink:0}
+.step-title{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center}
+.step-desc{font-size:12px;color:var(--gray);line-height:1.6;margin-left:32px}
+.step-desc code{background:var(--surface2);padding:2px 6px;border-radius:5px;font-family:monospace;font-size:11px;color:var(--orange)}
+.url-input-wrap{margin-top:14px}
+.url-label{font-size:10px;color:var(--orange);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.url-input{width:100%;padding:13px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:11px;color:var(--white);font-size:12px;font-family:monospace;outline:none;transition:border-color 0.2s}
+.url-input:focus{border-color:var(--orange)}
+.test-btn{width:100%;margin-top:8px;padding:11px;background:var(--surface2);color:var(--orange);border:1px solid var(--border);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.18s}
+.test-btn:hover{background:var(--orange-glow)}
+.test-result{font-size:12px;margin-top:8px;padding:8px 10px;border-radius:8px;display:none;line-height:1.5}
+.test-result.ok{background:rgba(52,199,89,0.12);color:var(--green);display:block}
+.test-result.err{background:rgba(255,59,48,0.1);color:var(--red);display:block}
+/* TOAST */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--orange);color:#fff;padding:11px 22px;border-radius:12px;font-size:13px;font-weight:700;z-index:500;pointer-events:none;animation:toastIn 0.25s ease;white-space:nowrap}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">
+    <div class="logo-icon">🔍</div>
+    <div>
+      <div class="logo-text">Búsqueda</div>
+      <div class="logo-sub">DNI · RUC · PERÚ</div>
+    </div>
+  </div>
+  <div class="hdr-actions">
+    <button class="hdr-btn" onclick="openHistory()" title="Historial">📋</button>
+    <button class="hdr-btn" onclick="openSetup()" title="Configurar backend">⚙️</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- BACKEND STATUS BANNER -->
+  <div class="backend-banner notset" id="backendBanner" onclick="openSetup()">
+    <div class="bb-icon" id="bannerIcon">⚠️</div>
+    <div class="bb-text">
+      <strong id="bannerTitle">Backend no configurado</strong>
+      <span id="bannerSub">Toca aquí para conectar tu Google Apps Script</span>
+    </div>
+    <div class="bb-arrow">›</div>
+  </div>
+
+  <!-- SEARCH CARD -->
+  <div class="search-card">
+    <div class="field-label">Número de Documento</div>
+    <div class="input-wrap">
+      <input type="number" id="docInput" class="doc-input"
+        placeholder="Ej: 12345678"
+        oninput="onInput(this)"
+        onkeydown="if(event.key==='Enter')buscar()">
+      <span class="type-badge" id="typeBadge"></span>
+    </div>
+    <div class="hint">8 dígitos = DNI &nbsp;·&nbsp; 11 dígitos = RUC</div>
+    <button class="search-btn" id="searchBtn" onclick="buscar()" disabled>
+      <span>🔍</span><span>BUSCAR</span>
+    </button>
+  </div>
+
+  <div class="status-bar">
+    <span class="status-dot" id="statusDot"></span>
+    <span id="statusText"></span>
+  </div>
+
+  <div id="resultArea"></div>
+  <div class="intentos-panel" id="intentosPanel" style="display:none">
+    <div class="intentos-title">🛡️ Tokens utilizados en esta búsqueda</div>
+    <div id="intentosRows"></div>
+  </div>
+
+</div>
+
+
+<!-- ═══════ HISTORY MODAL ═══════ -->
+<div class="overlay" id="histModal" onclick="if(event.target===this)closeModal('histModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="histTitle">Historial</div>
+    <div class="modal-sub">Toca un resultado para repetir la búsqueda</div>
+    <div id="histContent"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="clearHistory()">🗑️ Limpiar</button>
+      <button class="btn-ok" onclick="closeModal('histModal')">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════ SETUP MODAL ═══════ -->
+<div class="overlay" id="setupModal" onclick="if(event.target===this)closeModal('setupModal')">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">⚙️ Configurar Backend</div>
+    <div class="modal-sub">
+      El backend (Google Apps Script) hace las consultas de forma segura.<br>
+      Tu token <strong style="color:var(--orange)">nunca se expone</strong> al navegador.
+    </div>
+
+    <!-- PASO 1 -->
+    <div class="setup-step">
+      <div class="step-title"><span class="step-num">1</span>Crear el proyecto</div>
+      <div class="step-desc">
+        Ve a <code>script.google.com</code> → Nuevo proyecto<br>
+        Pega el contenido del archivo <code>BACKEND_GoogleAppsScript.js</code> que descargaste<br>
+        Agrega tu token en la variable <code>PERSONAL_TOKEN</code>
+      </div>
+    </div>
+
+    <!-- PASO 2 -->
+    <div class="setup-step">
+      <div class="step-title"><span class="step-num">2</span>Publicar como Web App</div>
+      <div class="step-desc">
+        Implementar → Nueva implementación → Tipo: <code>Aplicación web</code><br>
+        Ejecutar como: <code>Yo (tu cuenta)</code><br>
+        Quién puede acceder: <code>Cualquier usuario</code><br>
+        Clic en <code>Implementar</code> → copia la URL
+      </div>
+    </div>
+
+    <!-- PASO 3 — URL INPUT -->
+    <div class="setup-step">
+      <div class="step-title"><span class="step-num">3</span>Pegar la URL aquí</div>
+      <div class="step-desc">La URL tiene este formato:<br>
+        <code>https://script.google.com/macros/s/XXXX.../exec</code>
+      </div>
+      <div class="url-input-wrap">
+        <div class="url-label">URL de tu Web App</div>
+        <input type="text" id="gasUrlInput" class="url-input"
+          placeholder="https://script.google.com/macros/s/.../exec">
+        <button class="test-btn" onclick="testBackend()">🔌 Probar conexión</button>
+        <div class="test-result" id="testResult"></div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal('setupModal')">Cancelar</button>
+      <button class="btn-ok" onclick="saveBackendUrl()">💾 Guardar URL</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ─────────────────────────────────────────────
+   PERSISTENCIA
+   ───────────────────────────────────────────── */
+function getBackendUrl(){ return localStorage.getItem('dni_gas_url')||''; }
+function setBackendUrl(u){ localStorage.setItem('dni_gas_url', u.trim()); }
+function getHistorial(){ try{ return JSON.parse(localStorage.getItem('dni_hist')||'[]'); }catch{ return []; } }
+function guardarHistorial(tipo, num, nombre){
+  const h=getHistorial();
+  h.unshift({ tipo, num, nombre:nombre||'—', fecha:new Date().toLocaleString('es-PE',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) });
+  localStorage.setItem('dni_hist', JSON.stringify(h.slice(0,100)));
+}
+
+/* ─────────────────────────────────────────────
+   BANNER DE ESTADO
+   ───────────────────────────────────────────── */
+function updateBanner(state, title, sub){
+  const b=document.getElementById('backendBanner');
+  b.className='backend-banner '+state;
+  document.getElementById('bannerIcon').textContent = state==='ok'?'✅':state==='err'?'❌':'⚠️';
+  document.getElementById('bannerTitle').textContent = title;
+  document.getElementById('bannerSub').textContent   = sub;
+}
+
+/* ─────────────────────────────────────────────
+   INPUT
+   ───────────────────────────────────────────── */
+function onInput(el){
+  let v=el.value.replace(/\D/g,'');
+  if(v.length>11) v=v.slice(0,11);
+  el.value=v;
+  const badge=document.getElementById('typeBadge');
+  const btn=document.getElementById('searchBtn');
+  if(v.length===8){badge.textContent='DNI';badge.style.display='block';btn.disabled=false;}
+  else if(v.length===11){badge.textContent='RUC';badge.style.display='block';btn.disabled=false;}
+  else{badge.style.display='none';btn.disabled=true;}
+}
+
+/* ─────────────────────────────────────────────
+   BÚSQUEDA
+   ───────────────────────────────────────────── */
+async function buscar(){
+  const num=document.getElementById('docInput').value.replace(/\D/g,'');
+  if(num.length!==8&&num.length!==11) return;
+  const tipo=num.length===8?'DNI':'RUC';
+  const url=getBackendUrl();
+
+  if(!url){
+    toast('⚙️ Primero configura el backend con el botón ⚙️');
+    openSetup();
+    return;
+  }
+
+  setStatus('','');
+  document.getElementById('intentosPanel').style.display='none';
+  document.getElementById('resultArea').innerHTML=`
+    <div class="spinner-wrap">
+      <div class="spinner"></div>
+      <div class="spinner-label">Consultando ${tipo}…</div>
+      <div class="spinner-sub">${num}</div>
+    </div>`;
+
+  try {
+    const endpoint=url+(url.includes('?')?'&':'?')+'numero='+num;
+    const res=await fetch(endpoint,{signal:AbortSignal.timeout(20000)});
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const data=await res.json();
+
+    if(data.ok && data.datos){
+      showResult(tipo, num, data);
+      guardarHistorial(tipo, num, data.datos.nombreCompleto||data.datos.razonSocial||'');
+      setStatus('ok','Respuesta del backend ✓ · Fuente: '+(data.fuente||'—'));
+      updateBanner('ok','Backend conectado ✅', url.replace('https://','').slice(0,50)+'…');
+    } else {
+      showError(data.error||'No se encontró el documento.');
+      setStatus('err','Sin resultados');
+      if(data.intentos) renderIntentos(data.intentos);
+    }
+    if(data.intentos) renderIntentos(data.intentos);
+
+  } catch(e){
+    showError('No se pudo conectar con el backend.<br><small>'+e.message+'</small>');
+    setStatus('err','Error de conexión');
+    updateBanner('err','Error al conectar con el backend','Verifica la URL en ⚙️');
+  }
+}
+
+/* ─────────────────────────────────────────────
+   MOSTRAR RESULTADO
+   ───────────────────────────────────────────── */
+const LABELS_DNI = {
+  nombreCompleto:'Nombre completo', nombres:'Nombres',
+  apellidoPaterno:'Apellido paterno', apellidoMaterno:'Apellido materno',
+  numeroDocumento:'N° DNI', digitoVerificador:'Dígito verificador'
+};
+const LABELS_RUC = {
+  razonSocial:'Razón social', nombreComercial:'Nombre comercial',
+  numeroDocumento:'N° RUC', estado:'Estado SUNAT', condicion:'Condición',
+  direccion:'Dirección fiscal', departamento:'Departamento',
+  provincia:'Provincia', distrito:'Distrito',
+  tipoContribuyente:'Tipo contribuyente', actividadEconomica:'Actividad económica'
+};
+
+function showResult(tipo, num, resp){
+  const datos=resp.datos;
+  const labels=tipo==='DNI'?LABELS_DNI:LABELS_RUC;
+  const rows=Object.entries(datos).map(([k,v])=>{
+    if(!v||!labels[k]) return '';
+    const id='fv_'+Math.random().toString(36).slice(2,9);
+    return `<div class="rrow">
+      <div class="rinfo">
+        <div class="rfield-label">${labels[k]}</div>
+        <div class="rfield-val" id="${id}">${v}</div>
+      </div>
+      <button class="copy-btn" onclick="copiar('${id}',this)">📋 Copiar</button>
+    </div>`;
+  }).join('');
+  document.getElementById('resultArea').innerHTML=`
+    <div class="result-card">
+      <div class="result-head">
+        <span class="rbadge">${tipo}</span>
+        <span class="rnum">${formatNum(num)}</span>
+      </div>
+      ${rows}
+      ${resp.fuente?`<div class="fuente-tag">Fuente: ${resp.fuente}</div>`:''}
+    </div>`;
+}
+
+function formatNum(n){
+  if(n.length===8) return n.replace(/(\d{2})(\d{3})(\d{3})/,'$1.$2.$3');
+  if(n.length===11) return n.replace(/(\d{2})(\d{3})(\d{3})(\d{3})/,'$1-$2-$3-$4');
+  return n;
+}
+
+function showError(msg){
+  document.getElementById('resultArea').innerHTML=`
+    <div class="error-card">
+      <div class="error-icon">⚠️</div>
+      <div class="error-title">Sin resultado</div>
+      <div class="error-msg">${msg}</div>
+    </div>`;
+}
+
+function setStatus(t,m){
+  document.getElementById('statusDot').className='status-dot'+(t==='ok'?' ok':t==='err'?' err':'');
+  document.getElementById('statusText').textContent=m;
+}
+
+/* ─────────────────────────────────────────────
+   INTENTOS PANEL
+   ───────────────────────────────────────────── */
+const estadoIcon={ok:'🟢',fail:'🔴',sin_token:'⚫',sin_datos:'🟡',error_http:'🔴',excepcion:'🔴'};
+const estadoLabel={ok:'Exitoso',fail:'Falló',sin_token:'Sin token',sin_datos:'Sin datos',error_http:'Error HTTP',excepcion:'Excepción'};
+const estadoClass={ok:'ok',fail:'fail',sin_token:'skip',sin_datos:'skip',error_http:'fail',excepcion:'fail'};
+
+function renderIntentos(intentos){
+  if(!intentos||!intentos.length) return;
+  document.getElementById('intentosRows').innerHTML=intentos.map(i=>`
+    <div class="int-row">
+      <span>${estadoIcon[i.estado]||'⚫'}</span>
+      <span class="i-name ${i.estado==='ok'?'win':''}">${i.slot}</span>
+      <span class="i-tag ${estadoClass[i.estado]||'skip'}">${estadoLabel[i.estado]||i.estado}</span>
+    </div>`).join('');
+  document.getElementById('intentosPanel').style.display='block';
+}
+
+/* ─────────────────────────────────────────────
+   COPIAR
+   ───────────────────────────────────────────── */
+function copiar(id,btn){
+  const val=document.getElementById(id)?.textContent||'';
+  const done=()=>{btn.textContent='✅ Copiado';btn.classList.add('ok');setTimeout(()=>{btn.textContent='📋 Copiar';btn.classList.remove('ok');},2000);};
+  navigator.clipboard?.writeText(val).then(done).catch(()=>{const ta=document.createElement('textarea');ta.value=val;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);done();});
+}
+
+/* ─────────────────────────────────────────────
+   HISTORIAL
+   ───────────────────────────────────────────── */
+function openHistory(){
+  const h=getHistorial();
+  document.getElementById('histTitle').textContent=`Historial (${h.length})`;
+  document.getElementById('histContent').innerHTML=h.length===0
+    ?`<div class="h-empty"><div style="font-size:36px;margin-bottom:10px">📭</div><div>Sin búsquedas aún</div></div>`
+    :h.map(x=>`<div class="hist-item" onclick="reusar('${x.num}')">
+        <div class="hist-item-head"><span class="hist-badge">${x.tipo}</span><span class="hist-date">${x.fecha}</span></div>
+        <div class="hist-num">${x.num}</div>
+        <div class="hist-name">${x.nombre}</div>
+      </div>`).join('');
+  openModal('histModal');
+}
+function reusar(num){closeModal('histModal');const i=document.getElementById('docInput');i.value=num;onInput(i);setTimeout(buscar,120);}
+function clearHistory(){if(confirm('¿Borrar historial?')){localStorage.removeItem('dni_hist');closeModal('histModal');toast('🗑️ Historial borrado');}}
+
+/* ─────────────────────────────────────────────
+   SETUP MODAL
+   ───────────────────────────────────────────── */
+function openSetup(){
+  document.getElementById('gasUrlInput').value=getBackendUrl();
+  document.getElementById('testResult').className='test-result';
+  document.getElementById('testResult').textContent='';
+  openModal('setupModal');
+}
+
+async function testBackend(){
+  const url=(document.getElementById('gasUrlInput').value||'').trim();
+  const res=document.getElementById('testResult');
+  if(!url){res.className='test-result err';res.textContent='⚠️ Ingresa primero la URL';return;}
+  res.className='test-result';res.textContent='⏳ Probando conexión…';res.style.display='block';
+  try{
+    const r=await fetch(url,{signal:AbortSignal.timeout(12000)});
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    const d=await r.json();
+    res.className='test-result ok';
+    res.textContent='✅ Backend activo: '+(d.msg||JSON.stringify(d).slice(0,80));
+  }catch(e){
+    res.className='test-result err';
+    res.textContent='❌ Error: '+e.message;
+  }
+}
+
+function saveBackendUrl(){
+  const url=(document.getElementById('gasUrlInput').value||'').trim();
+  if(!url){toast('⚠️ La URL no puede estar vacía');return;}
+  if(!url.startsWith('https://script.google.com')){
+    if(!confirm('La URL no parece de Google Apps Script. ¿Guardar de todas formas?')) return;
+  }
+  setBackendUrl(url);
+  closeModal('setupModal');
+  toast('✅ URL guardada');
+  updateBanner('ok','Backend configurado ✅','Haz una búsqueda para verificar');
+}
+
+/* ─────────────────────────────────────────────
+   MODALS + TOAST
+   ───────────────────────────────────────────── */
+function openModal(id){document.getElementById(id).classList.add('show');}
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2600);}
+
+/* ─────────────────────────────────────────────
+   INIT
+   ───────────────────────────────────────────── */
+(function init(){
+  const url=getBackendUrl();
+  if(url){
+    updateBanner('ok','Backend configurado ✅', url.replace('https://script.google.com/macros/s/','…/').slice(0,55));
+  } else {
+    updateBanner('notset','Backend no configurado','Toca aquí para conectar Google Apps Script');
+  }
+})();
+</script>
+</body>
+</html>
